@@ -9,3 +9,6 @@ practicing more complicated Scripting principles._
 This is the result of one of Unity3D official tutorials that can be found in
 the website, [Space
 Shooter](http://unity3d.com/learn/tutorials/projects/space-shooter).
+
+A deployed web version of the game can be found
+[here](http://www.javiman.com/space-shooter/).
