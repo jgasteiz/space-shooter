@@ -33,13 +33,14 @@ public class DestroyByContact : MonoBehaviour
 		// Player explosion
 		if (other.tag == "Player") {
 			Instantiate (playerExplosion, other.transform.position, other.transform.rotation);
-			gameController.GameOver ();
+			gameController.PlayerDies ();
 		}
 
 		gameController.AddScore (scoreValue);
 
-		// Destroy the laser bolt
+		// Destroy the game object - bolt or player
 		Destroy (other.gameObject);
+
 		// Destroy the game object itself
 		Destroy (gameObject);
 	}
