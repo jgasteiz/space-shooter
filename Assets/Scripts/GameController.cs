@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
 	private bool restart;
 	private bool started;
 	private int score;
+	private int waveNum;
 
 	private string TITLE = "SPACE\nSHOOTER";
 	private string INSTRUCTIONS = "Moving: WASD\nFire: SPACEBAR\n\nPress SPACEBAR to begin";
@@ -36,6 +37,8 @@ public class GameController : MonoBehaviour
 	private KeyCode RESTART_KEYCODE = KeyCode.R;
 	private KeyCode START_KEYCODE = KeyCode.Space;
 
+	private PlayerController playerController;
+
 	void Start ()
 	{
 		gameOver = false;
@@ -43,9 +46,10 @@ public class GameController : MonoBehaviour
 		restart = false;
 		started = false;
 		score = 0;
+		waveNum = 1;
 
-		UpdateTitle (TITLE);
-		UpdateInstructions (INSTRUCTIONS);
+		SetTitle (TITLE);
+		SetInstructions (INSTRUCTIONS);
 	}
 
 	void Update ()
@@ -75,6 +79,10 @@ public class GameController : MonoBehaviour
 		yield return new WaitForSeconds (startWait);
 
 		while (true) {
+			SetTitle ("Wave " + waveNum);
+			yield return new WaitForSeconds (startWait);
+			SetTitle ("");
+
 			for (int i = 0; i < hazardCount; i++) {
 				SpawnEnemy (ASTEROID);
 				yield return new WaitForSeconds (spawnWait);
@@ -85,8 +93,26 @@ public class GameController : MonoBehaviour
 
 			yield return new WaitForSeconds (waveWait);
 
+			waveNum += 1;
+
+			playerController.increaseFireLevel ();
+
+			// TODO: make this nicer!
+			if (hazardCount < 60) {
+				hazardCount += hazardCount * waveNum / 10;
+			}
+			if (hazardCount > 60) {
+				hazardCount = 60;
+			}
+			if (spawnWait > 0.25f) {
+				spawnWait -= spawnWait / 4;
+			}
+			if (spawnWait < 0.25f) {
+				spawnWait = 0.25f;
+			}
+
 			if (gameOver) {
-				UpdateInstructions (RESTART_INSTRUCTIONS);
+				SetInstructions (RESTART_INSTRUCTIONS);
 				restart = true;
 				break;
 			} else if (playerDead) {
@@ -104,8 +130,8 @@ public class GameController : MonoBehaviour
 	{
 		started = true;
 		
-		UpdateTitle ("");
-		UpdateInstructions ("");
+		SetTitle ("");
+		SetInstructions ("");
 		UpdateScore ();
 		UpdateExtraLives ();
 		
@@ -126,13 +152,17 @@ public class GameController : MonoBehaviour
 		} else if (type == SHIP) {
 			Instantiate (enemyShip, spawnPosition, spawnRotation);
 		}
+	}
+
+	void ShowTitleWave ()
+	{
 
 	}
 
 	/**
 	 * Update the title GuiText with the given title.
 	 */
-	void UpdateTitle (string title)
+	void SetTitle (string title)
 	{
 		titleText.text = title;
 	}
@@ -140,7 +170,7 @@ public class GameController : MonoBehaviour
 	/**
 	 * Update the instructions GuiText with the given instructions.
 	 */
-	void UpdateInstructions (string instructions)
+	void SetInstructions (string instructions)
 	{
 		instructionsText.text = instructions;
 	}
@@ -170,6 +200,14 @@ public class GameController : MonoBehaviour
 		Quaternion spawnRotation = Quaternion.identity;
 		Instantiate (playerShip, spawnPosition, spawnRotation);
 		playerDead = false;
+
+		GameObject playerControllerObject = GameObject.FindWithTag ("Player");
+		if (playerControllerObject != null) {
+			playerController = playerControllerObject.GetComponent <PlayerController> ();
+		}
+		if (playerController == null) {
+			Debug.Log ("Cannot find 'playerController' script");
+		}
 	}
 
 	/**
@@ -190,7 +228,7 @@ public class GameController : MonoBehaviour
 	{
 		extraLives = extraLives - 1;
 		if (extraLives < 0) {
-			UpdateTitle (GAME_OVER);
+			SetTitle (GAME_OVER);
 			gameOver = true;
 		} else {
 			UpdateExtraLives ();

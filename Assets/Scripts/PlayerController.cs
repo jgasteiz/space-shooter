@@ -15,17 +15,54 @@ public class PlayerController : MonoBehaviour
 	public Boundary boundary;
 
 	public GameObject shot;
-	public Transform shotSpawn;
+	public Transform centreShotSpawn;
+	public Transform leftShotSpawn;
+	public Transform rightShotSpawn;
+	public Transform farLeftShotSpawn;
+	public Transform farRightShotSpawn;
 	public float fireRate;
 
-	private float nextFire = 0.0F;
+	private int fireLevel;
+
+	private float nextFire;
+
+	void Start ()
+	{
+		fireLevel = 0;
+		nextFire = 0.0f;
+	}
 
 	void Update ()
 	{
 		if ((Input.GetButton ("Fire1") || Input.GetKey ("space")) && Time.time > nextFire) {
 			nextFire = Time.time + fireRate;
-			Instantiate (shot, shotSpawn.position, shotSpawn.rotation);
+			Fire ();
 			audio.Play ();
+		}
+	}
+
+	void Fire ()
+	{
+		switch (fireLevel) {
+		case 0:
+			Instantiate (shot, centreShotSpawn.position, centreShotSpawn.rotation);
+			break;
+		case 1:
+			Instantiate (shot, leftShotSpawn.position, leftShotSpawn.rotation);
+			Instantiate (shot, rightShotSpawn.position, rightShotSpawn.rotation);
+			break;
+		case 2:
+			Instantiate (shot, centreShotSpawn.position, centreShotSpawn.rotation);
+			Instantiate (shot, farLeftShotSpawn.position, farLeftShotSpawn.rotation);
+			Instantiate (shot, farRightShotSpawn.position, farRightShotSpawn.rotation);
+			break;
+		}
+	}
+
+	public void increaseFireLevel ()
+	{
+		if (fireLevel < 2) {
+			fireLevel += 1;
 		}
 	}
 
