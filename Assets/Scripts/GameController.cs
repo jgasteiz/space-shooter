@@ -93,24 +93,19 @@ public class GameController : MonoBehaviour
 
 			yield return new WaitForSeconds (waveWait);
 
+			// Increase wave num
 			waveNum += 1;
 
+			// Increase player's fire level
 			playerController.increaseFireLevel ();
 
-			// TODO: make this nicer!
-			if (hazardCount < 60) {
-				hazardCount += hazardCount * waveNum / 10;
-			}
-			if (hazardCount > 60) {
-				hazardCount = 60;
-			}
-			if (spawnWait > 0.25f) {
-				spawnWait -= spawnWait / 4;
-			}
-			if (spawnWait < 0.25f) {
-				spawnWait = 0.25f;
-			}
+			// Change hazard count based on the current hazard count and wave num.
+			hazardCount = increaseHazardCount(hazardCount, waveNum);
 
+			// Change spawn wait based on the current spawn wait.
+			spawnWait = decreaseSpawnWait(spawnWait);
+
+			// If game over, do stuff
 			if (gameOver) {
 				SetInstructions (RESTART_INSTRUCTIONS);
 				restart = true;
@@ -119,6 +114,39 @@ public class GameController : MonoBehaviour
 				SpawnPlayer ();
 			}
 		}
+	}
+
+	/**
+	 * Given a hazard count and a number of wave, calculate a new
+	 * hazard count.
+	 */
+	int increaseHazardCount (int currentHazardCount, int waveNum) {
+		int newHazardCount = currentHazardCount;
+
+		if (currentHazardCount < 60) {
+			newHazardCount += currentHazardCount * waveNum / 10;
+		}
+		if (newHazardCount > 60) {
+			newHazardCount = 60;
+		}
+
+		return newHazardCount;
+	}
+
+	/**
+	 * Given a spawn wait, decrease it and return the new one.
+	 */
+	float decreaseSpawnWait (float currentSpawnWait) {
+		float newSpawnWait = currentSpawnWait;
+		
+		if (currentSpawnWait > 0.25f) {
+			newSpawnWait -= currentSpawnWait / 4;
+		}
+		if (newSpawnWait < 0.25f) {
+			newSpawnWait = 0.25f;
+		}
+		
+		return newSpawnWait;
 	}
 
 	/**
