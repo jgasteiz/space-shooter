@@ -83,11 +83,6 @@ public class GameController : MonoBehaviour
 			yield return new WaitForSeconds (startWait);
 			SetTitle ("");
 
-			for (int i = 0; i < hazardCount; i++) {
-				SpawnEnemy (ASTEROID);
-				yield return new WaitForSeconds (spawnWait);
-			}
-
 			SpawnEnemy (SHIP);
 			yield return new WaitForSeconds (spawnWait);
 
