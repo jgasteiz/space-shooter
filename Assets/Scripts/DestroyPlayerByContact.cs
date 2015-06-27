@@ -1,12 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class DestroyByContact : MonoBehaviour
+public class DestroyPlayerByContact : MonoBehaviour
 {
-
-	public GameObject explosion;
+	
 	public GameObject playerExplosion;
-	public int scoreValue;
 	private GameController gameController;
 
 	void Start ()
@@ -17,7 +15,7 @@ public class DestroyByContact : MonoBehaviour
 		}
 		if (gameController == null) {
 			Debug.Log ("Cannot find 'GameController' script");
-		}
+		}	
 	}
 
 	void OnTriggerEnter (Collider other)
@@ -27,25 +25,16 @@ public class DestroyByContact : MonoBehaviour
 			return;
 		}
 
-		if (other.tag == "EnemyBolt") {
-			return;
-		}
-
-		// Explosion!
-		Instantiate (explosion, transform.position, transform.rotation);
-
 		// Player explosion
 		if (other.tag == "Player") {
 			Instantiate (playerExplosion, other.transform.position, other.transform.rotation);
 			gameController.PlayerDies ();
+
+			// Destroy the game object - bolt or player
+			Destroy (other.gameObject);
+			
+			// Destroy the game object itself
+			Destroy (gameObject);
 		}
-
-		gameController.AddScore (scoreValue);
-
-		// Destroy the game object - bolt or player
-		Destroy (other.gameObject);
-
-		// Destroy the game object itself
-		Destroy (gameObject);
 	}
 }

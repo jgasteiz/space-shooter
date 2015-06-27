@@ -83,8 +83,10 @@ public class GameController : MonoBehaviour
 			yield return new WaitForSeconds (startWait);
 			SetTitle ("");
 
-			SpawnEnemy (SHIP);
-			yield return new WaitForSeconds (spawnWait);
+			for (int i = 0; i < hazardCount; i++) {
+				SpawnEnemy (SHIP);
+				yield return new WaitForSeconds (spawnWait);
+			}
 
 			yield return new WaitForSeconds (waveWait);
 
@@ -169,12 +171,7 @@ public class GameController : MonoBehaviour
 	{
 		float valueX = Random.Range (-spawnValues.x, spawnValues.x);
 		Vector3 spawnPosition = new Vector3 (valueX, spawnValues.y, spawnValues.z);
-		Quaternion spawnRotation = Quaternion.identity;
-		if (type == ASTEROID) {
-			Instantiate (hazard, spawnPosition, spawnRotation);
-		} else if (type == SHIP) {
-			Instantiate (enemyShip, spawnPosition, spawnRotation);
-		}
+		Instantiate (enemyShip, spawnPosition, Quaternion.Euler (0.0f, 180.0f, 0.0f));
 	}
 
 	void ShowTitleWave ()

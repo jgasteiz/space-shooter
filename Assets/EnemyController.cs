@@ -19,7 +19,6 @@ public class EnemyController : MonoBehaviour {
 		if (Time.time > nextFire) {
 			nextFire = Time.time + fireRate;
 			Fire ();
-			GetComponent<AudioSource>().Play ();
 		}
 	}
 
