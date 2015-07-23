@@ -30,7 +30,7 @@ public class GameController : MonoBehaviour
 	private int waveNum;
 
 	private string TITLE = "SPACE\nSHOOTER";
-	private string INSTRUCTIONS = "Moving: WASD\nFire: SPACEBAR\n\nPress SPACEBAR to begin";
+	private string INSTRUCTIONS = "Moving: WASD\n\nLaser: SPACEBAR\nBombs: B\n\nPress SPACEBAR to begin";
 	private string RESTART_INSTRUCTIONS = "Press 'R' to Restart";
 	private string GAME_OVER = "GAME OVER";
 
