@@ -15,6 +15,7 @@ public class PlayerController : MonoBehaviour
 	public Boundary boundary;
 
 	public GameObject shot;
+	public GameObject bomb;
 	public Transform centreShotSpawn;
 	public Transform leftShotSpawn;
 	public Transform rightShotSpawn;
@@ -34,28 +35,39 @@ public class PlayerController : MonoBehaviour
 
 	void Update ()
 	{
-		if ((Input.GetButton ("Fire1") || Input.GetKey ("space")) && Time.time > nextFire) {
-			nextFire = Time.time + fireRate;
-			Fire ();
-			GetComponent<AudioSource>().Play ();
+		if (Time.time > nextFire) {
+			if (Input.GetButton ("Fire1") || Input.GetKey ("space")) {
+				nextFire = Time.time + fireRate;
+				Fire ("Fire1");
+				GetComponent<AudioSource>().Play ();
+			} else if (Input.GetKey ("b")) {
+				Debug.Log("Got b");
+				nextFire = Time.time + fireRate;
+				Fire ("Fire2");
+				GetComponent<AudioSource>().Play ();
+			}
 		}
 	}
 
-	void Fire ()
+	void Fire (string fireType)
 	{
-		switch (fireLevel) {
-		case 0:
-			Instantiate (shot, centreShotSpawn.position, centreShotSpawn.rotation);
-			break;
-		case 1:
-			Instantiate (shot, leftShotSpawn.position, leftShotSpawn.rotation);
-			Instantiate (shot, rightShotSpawn.position, rightShotSpawn.rotation);
-			break;
-		case 2:
-			Instantiate (shot, centreShotSpawn.position, centreShotSpawn.rotation);
-			Instantiate (shot, farLeftShotSpawn.position, farLeftShotSpawn.rotation);
-			Instantiate (shot, farRightShotSpawn.position, farRightShotSpawn.rotation);
-			break;
+		if (fireType == "Fire1") {
+			switch (fireLevel) {
+			case 0:
+				Instantiate (shot, centreShotSpawn.position, centreShotSpawn.rotation);
+				break;
+			case 1:
+				Instantiate (shot, leftShotSpawn.position, leftShotSpawn.rotation);
+				Instantiate (shot, rightShotSpawn.position, rightShotSpawn.rotation);
+				break;
+			case 2:
+				Instantiate (shot, centreShotSpawn.position, centreShotSpawn.rotation);
+				Instantiate (shot, farLeftShotSpawn.position, farLeftShotSpawn.rotation);
+				Instantiate (shot, farRightShotSpawn.position, farRightShotSpawn.rotation);
+				break;
+			}
+		} else if (fireType == "Fire2") {
+			Instantiate (bomb, centreShotSpawn.position, centreShotSpawn.rotation);
 		}
 	}
 
