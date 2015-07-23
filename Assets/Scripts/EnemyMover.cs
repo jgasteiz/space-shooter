@@ -9,10 +9,13 @@ public class EnemyMover : MonoBehaviour {
 	private int direction;
 	
 	void Start () {
-		GetComponent<Rigidbody>().velocity = transform.forward * speed;
-
 		// Get a random direction - 0 or 1
 		direction = Random.Range(0, 2);
+
+		// Randomize initial speed a bit (up to double of original speed)
+		speed = speed * (float)Random.Range(10, 20) / 10f;
+
+		GetComponent<Rigidbody>().velocity = transform.forward * speed;
 	}
 	
 	void FixedUpdate () {
