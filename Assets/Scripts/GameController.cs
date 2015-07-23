@@ -18,6 +18,7 @@ public class GameController : MonoBehaviour
 	public Vector3 spawnValues;
 
 	public GUIText scoreText;
+	public GUIText bombsText;
 	public GUIText instructionsText;
 	public GUIText titleText;
 	public GUIText extraLivesText;
@@ -82,6 +83,9 @@ public class GameController : MonoBehaviour
 			SetTitle ("Wave " + waveNum);
 			yield return new WaitForSeconds (startWait);
 			SetTitle ("");
+
+			playerController.resetBombs();
+			UpdateBoms();
 
 			enemyShips = new List<GameObject>();
 			for (int i = 0; i < hazardCount; i++) {
@@ -212,6 +216,14 @@ public class GameController : MonoBehaviour
 	void UpdateScore ()
 	{
 		scoreText.text = "Score: " + score;
+	}
+
+	/**
+	 * Update the bombs GuiText with the current score.
+	 */
+	public void UpdateBoms ()
+	{
+		bombsText.text = "Bombs: " + playerController.GetRemainingBombs();
 	}
 
 	/**

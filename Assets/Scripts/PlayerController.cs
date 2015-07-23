@@ -22,8 +22,12 @@ public class PlayerController : MonoBehaviour
 	public Transform farLeftShotSpawn;
 	public Transform farRightShotSpawn;
 	public float fireRate;
+	public int initialBombs;
 
 	private int fireLevel;
+	private int remainingBombs;
+
+	private GameController gameController;
 
 	private float nextFire;
 
@@ -31,6 +35,15 @@ public class PlayerController : MonoBehaviour
 	{
 		fireLevel = 0;
 		nextFire = 0.0f;
+		remainingBombs = 10;
+
+		GameObject gameControllerObject = GameObject.FindWithTag ("GameController");
+		if (gameControllerObject != null) {
+			gameController = gameControllerObject.GetComponent <GameController> ();
+		}
+		if (gameController == null) {
+			Debug.Log ("Cannot find 'GameController' script");
+		}
 	}
 
 	void Update ()
@@ -39,12 +52,10 @@ public class PlayerController : MonoBehaviour
 			if (Input.GetButton ("Fire1") || Input.GetKey ("space")) {
 				nextFire = Time.time + fireRate;
 				Fire ("Fire1");
-				GetComponent<AudioSource>().Play ();
 			} else if (Input.GetKey ("b")) {
 				Debug.Log("Got b");
 				nextFire = Time.time + fireRate;
 				Fire ("Fire2");
-				GetComponent<AudioSource>().Play ();
 			}
 		}
 	}
@@ -52,6 +63,7 @@ public class PlayerController : MonoBehaviour
 	void Fire (string fireType)
 	{
 		if (fireType == "Fire1") {
+			GetComponent<AudioSource>().Play ();
 			switch (fireLevel) {
 			case 0:
 				Instantiate (shot, centreShotSpawn.position, centreShotSpawn.rotation);
@@ -66,7 +78,10 @@ public class PlayerController : MonoBehaviour
 				Instantiate (shot, farRightShotSpawn.position, farRightShotSpawn.rotation);
 				break;
 			}
-		} else if (fireType == "Fire2") {
+		} else if (fireType == "Fire2" && remainingBombs > 0) {
+			GetComponent<AudioSource>().Play ();
+			remainingBombs = remainingBombs - 1;
+			gameController.UpdateBoms ();
 			Instantiate (bomb, centreShotSpawn.position, centreShotSpawn.rotation);
 		}
 	}
@@ -76,6 +91,16 @@ public class PlayerController : MonoBehaviour
 		if (fireLevel < 2) {
 			fireLevel += 1;
 		}
+	}
+
+	public void resetBombs ()
+	{
+		remainingBombs = initialBombs;
+	}
+
+	public int GetRemainingBombs ()
+	{
+		return remainingBombs;
 	}
 
 	// Update is called once per frame
