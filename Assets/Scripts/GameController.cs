@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameController : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class GameController : MonoBehaviour
 	public float startWait;
 	public float waveWait;
 	public int hazardCount;
+	public int maxHazardCount;
 	public int extraLives;
 	public Vector3 spawnValues;
 
@@ -32,8 +34,6 @@ public class GameController : MonoBehaviour
 	private string RESTART_INSTRUCTIONS = "Press 'R' to Restart";
 	private string GAME_OVER = "GAME OVER";
 
-	private int ASTEROID = 0;
-	private int SHIP = 1;
 	private KeyCode RESTART_KEYCODE = KeyCode.R;
 	private KeyCode START_KEYCODE = KeyCode.Space;
 
@@ -73,22 +73,30 @@ public class GameController : MonoBehaviour
 	 * This method will spawn waves of enemies after an
 	 * initial wait time.
 	 */
-	IEnumerator SpawnWaves ()
+	IEnumerator mainLoop ()
 	{
-		// Wait a bit before starting the waves
-		yield return new WaitForSeconds (startWait);
 
+		List<GameObject> enemyShips;
 		while (true) {
+
 			SetTitle ("Wave " + waveNum);
 			yield return new WaitForSeconds (startWait);
 			SetTitle ("");
 
+			enemyShips = new List<GameObject>();
 			for (int i = 0; i < hazardCount; i++) {
-				SpawnEnemy (SHIP);
+				// If the player is dead, exit the loop.
+				if (playerDead) {
+					break;
+				}
+				enemyShips.Add(SpawnEnemy ());
 				yield return new WaitForSeconds (spawnWait);
 			}
 
-			yield return new WaitForSeconds (waveWait);
+			// Wait until all enemies are dead
+			while (areEnemiesDead(enemyShips) == false) {
+				yield return new WaitForSeconds (spawnWait);
+			}
 
 			// Increase wave num
 			waveNum += 1;
@@ -114,20 +122,31 @@ public class GameController : MonoBehaviour
 	}
 
 	/**
+	 * Given a list of enemies, return true if all of
+	 * them are dead - the objects are null
+	 */
+	bool areEnemiesDead(List<GameObject> enemies) {
+		bool allEnemiesDead = true;
+		foreach (GameObject enemy in enemies) {
+			if (enemy != null) {
+				allEnemiesDead = false;
+			}
+		}
+		return allEnemiesDead;
+	}
+
+	/**
 	 * Given a hazard count and a number of wave, calculate a new
 	 * hazard count.
 	 */
 	int increaseHazardCount (int currentHazardCount, int waveNum) {
 		int newHazardCount = currentHazardCount;
 
-		if (currentHazardCount < 60) {
+		if (currentHazardCount < maxHazardCount) {
 			newHazardCount += currentHazardCount * waveNum / 10;
 		}
-		if (newHazardCount > 60) {
-			newHazardCount = 60;
-		}
 
-		return newHazardCount;
+		return Mathf.Min(newHazardCount, maxHazardCount);
 	}
 
 	/**
@@ -139,11 +158,8 @@ public class GameController : MonoBehaviour
 		if (currentSpawnWait > 0.25f) {
 			newSpawnWait -= currentSpawnWait / 4;
 		}
-		if (newSpawnWait < 0.25f) {
-			newSpawnWait = 0.25f;
-		}
 		
-		return newSpawnWait;
+		return Mathf.Max(0.25f, newSpawnWait);
 	}
 
 	/**
@@ -161,22 +177,17 @@ public class GameController : MonoBehaviour
 		UpdateExtraLives ();
 		
 		SpawnPlayer ();
-		StartCoroutine (SpawnWaves ());
+		StartCoroutine (mainLoop ());
 	}
 
 	/**
-	 * Given a type, spawns an enemy.
+	 * Spawns an enemy.
 	 */
-	void SpawnEnemy (int type)
+	GameObject SpawnEnemy ()
 	{
 		float valueX = Random.Range (-spawnValues.x, spawnValues.x);
 		Vector3 spawnPosition = new Vector3 (valueX, spawnValues.y, spawnValues.z);
-		Instantiate (enemyShip, spawnPosition, Quaternion.Euler (0.0f, 180.0f, 0.0f));
-	}
-
-	void ShowTitleWave ()
-	{
-
+		return (GameObject) Instantiate (enemyShip, spawnPosition, Quaternion.Euler (0.0f, 180.0f, 0.0f));
 	}
 
 	/**
